@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Список дел</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="js/react.js"></script>
+    <script src="js/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="program"></div>
+    <script type="text/babel">
+      class Task extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            edit: false,
+          };
+        };
+
+        edit = () => {
+          this.setState ({edit: true});
+        };
+        
+        remove = () =>{
+          this.props.deleteBlock (this.props.index);
+        };
+
+        save = () =>{
+          
+          this.props.update (this.refs.newTxt.value, this.props.index);
+          this.setState({edit: false})
+        };
+
+        rendNorm = () =>{
+          return (
+          <div className="todu__main">
+            <div className="todu__item">
+              <label>
+              <input type="checkbox" />
+              <span className="check"></span>
+              </label>
+              <div className = "text">{this.props.children}</div>
+              <button onClick={this.edit} className="edit"></button>
+              <button onClick={this.remove} className="delite"></button>
+            </div>
+          </div> 
+        );
+        };
+
+        rendEdit = () =>{
+          return (
+          <div className="todu__main">
+            <div className="todu__item">
+              <input className="list__inp" ref="newTxt" defaultValue={this.props.children} />
+              <button onClick={this.save} className="save"></button>
+            </div>
+           </div> 
+        );
+        };
+
+        render() {
+          if (this.state.edit){
+          return this.rendEdit ();
+            } else {
+              return this.rendNorm();
+            }
+          }
+        }
+
+        class Field extends React.Component {
+          constructor(props) {
+            super(props);
+            this.state = {
+              tasks: [
+                'Task 1',
+                'Task 2',
+                'Task 3',
+                'Task 4',
+                'Task 5'
+              ]
+            };
+          };
+
+          deleteBlock = (i) => {
+            var arr = this.state.tasks;
+            arr.splice (i, 1);
+            this.setState ({tasks: arr});
+          };
+
+          updateText = (text, i) => {
+            var arr = this.state.tasks;
+            arr[i] = text;
+            this.setState ({tasks: arr});
+          };
+
+          add = () => {
+        console.log('asdasd');
+          var text = this.refs.addTxt.value;
+          var arr = this.state.tasks;
+          arr.push(text);
+          this.refs.addTxt.value='';
+          this.setState ({tasks: arr});
+        };
+
+          eachTask = (item, i) => {
+            return (
+              <Task key={i} index={i} update={this.updateText} deleteBlock={this.deleteBlock}>
+                {item}
+              </Task>
+            );
+          };
+
+          render() {
+            return (
+              <div className="list">
+              <div className="tody">
+                <fieldset className="list__header">
+                  <legend className="list__title ">Список дел</legend>
+                  <input ref="addTxt" className="list__inp"  />
+                </fieldset>
+                <button onClick={this.add} className="list__btn ">Добавить</button>
+              </div>  
+                {this.state.tasks.map (this.eachTask)}
+              </div>
+            );
+          }
+        }  
+
+      const app = document.getElementById("program");
+
+      ReactDOM.render(<Field />, app);
+    </script>
+
+  </body>
+</html>
